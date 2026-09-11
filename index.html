@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CBZ Institute of Education</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="header">
+
+    <div class="logo-area">
+
+        <div class="logo">
+            CBZ
+        </div>
+
+        <div>
+            <h2>CBZ Institute of Education</h2>
+            <p>Learn • Practice • Succeed</p>
+        </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <button
+            class="login-btn"
+            onclick="openStudentLogin()"
+        >
+            Students Login
+        </button>
+
+        <button
+            class="login-btn admin-login-btn"
+            onclick="openAdminLogin()"
+        >
+            Admin Login
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     HOME PAGE
+===================================================== -->
+
+<main id="homePage">
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <span class="welcome-badge">
+                CBZ INSTITUTE OF EDUCATION
+            </span>
+
+            <h1>
+                Welcome to
+                <span>CBZ Institute of Education</span>
+            </h1>
+
+            <p>
+                A simple learning platform for students to access
+                study materials, mock tests, video classes,
+                syllabus and question papers.
+            </p>
+
+            <button
+                class="primary-btn"
+                onclick="openStudentLogin()"
+            >
+                Start Learning →
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         FEATURES
+    ================================================= -->
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <span>LEARNING FEATURES</span>
+
+            <h2>
+                Everything students need
+            </h2>
+
+            <p>
+                Learn from notes, videos, tests and practice materials.
+            </p>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📚
+                </div>
+
+                <h3>Study Notes</h3>
+
+                <p>
+                    Access class-wise and subject-wise study materials.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📝
+                </div>
+
+                <h3>Mock Tests</h3>
+
+                <p>
+                    Practice questions and check your performance.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    ▶️
+                </div>
+
+                <h3>Video Classes</h3>
+
+                <p>
+                    Learn through CBZ Institute's video classes.
+                </p>
+
+            </div>
+
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📄
+                </div>
+
+                <h3>Question Papers</h3>
+
+                <p>
+                    Practice previous and important question papers.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         SUBJECTS
+    ================================================= -->
+
+    <section class="section light-section">
+
+        <div class="section-heading">
+
+            <span>SUBJECTS</span>
+
+            <h2>
+                Learn your favourite subjects
+            </h2>
+
+            <p>
+                Study material is organised subject-wise for easy access.
+            </p>
+
+        </div>
+
+
+        <div class="subjects-grid">
+
+            <div class="subject-card">📐 Mathematics</div>
+
+            <div class="subject-card">⚛️ Physics</div>
+
+            <div class="subject-card">🧪 Chemistry</div>
+
+            <div class="subject-card">🧬 Biology</div>
+
+            <div class="subject-card">🌍 Geography</div>
+
+            <div class="subject-card">📜 History</div>
+
+            <div class="subject-card">📖 English</div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         CLASSES
+    ================================================= -->
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <span>CLASSES</span>
+
+            <h2>
+                Classes 5 to 12
+            </h2>
+
+            <p>
+                Learning resources organised according to class.
+            </p>
+
+        </div>
+
+
+        <div class="classes-grid">
+
+            <div>Class 5</div>
+            <div>Class 6</div>
+            <div>Class 7</div>
+            <div>Class 8</div>
+            <div>Class 9</div>
+            <div>Class 10</div>
+            <div>Class 11</div>
+            <div>Class 12</div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         NOTICE BOARD
+    ================================================= -->
+
+    <section class="section light-section">
+
+        <div class="section-heading">
+
+            <span>IMPORTANT UPDATES</span>
+
+            <h2>
+                Notice Board
+            </h2>
+
+            <p>
+                Important announcements from CBZ Institute.
+            </p>
+
+        </div>
+
+
+        <div
+            id="homeNoticeBoard"
+            class="notice-box"
+        >
+
+            <div class="notice-item">
+
+                <strong>
+                    Welcome to CBZ Institute of Education
+                </strong>
+
+                <p>
+                    Students can login to access available learning resources.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         CONTACT
+    ================================================= -->
+
+    <section class="section contact-section">
+
+        <div class="section-heading">
+
+            <span>CONTACT US</span>
+
+            <h2>
+                Get in touch with CBZ Institute
+            </h2>
+
+            <p>
+                Contact us for classes, study materials and assistance.
+            </p>
+
+        </div>
+
+
+        <div class="contact-details">
+
+
+            <!-- PHONE -->
+
+            <div class="contact-card">
+
+                <div class="contact-icon">
+                    📞
+                </div>
+
+                <h3>
+                    Contact
+                </h3>
+
+                <p>
+                    <a href="tel:+918981262617">
+                        +91 8981262617
+                    </a>
+                </p>
+
+                <p>
+                    <a href="tel:+918910883754">
+                        +91 8910883754
+                    </a>
+                </p>
+
+            </div>
+
+
+            <!-- LOCATION -->
+
+            <div class="contact-card">
+
+                <div class="contact-icon">
+                    📍
+                </div>
+
+                <h3>
+                    Location
+                </h3>
+
+                <p>
+                    Visit CBZ Institute of Education.
+                </p>
+
+                <a
+                    class="location-btn"
+                    href="https://maps.app.goo.gl/f6AaTeU72pb9TaBCA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    📍 Open Location
+                </a>
+
+            </div>
+
+
+            <!-- YOUTUBE -->
+
+            <div class="contact-card">
+
+                <div class="contact-icon">
+                    ▶️
+                </div>
+
+                <h3>
+                    YouTube
+                </h3>
+
+                <p>
+                    Watch CBZ Institute video classes.
+                </p>
+
+                <button
+                    class="youtube-btn"
+                    onclick="openYoutube()"
+                >
+                    ▶️ Visit Channel
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- SOCIAL LINKS -->
+
+        <div class="social-links">
+
+            <a
+                class="social-btn"
+                href="https://www.instagram.com/chandan.2404?utm_source=qr&stkn=bWV4b2luYnRvaWhj"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Instagram
+            </a>
+
+
+            <a
+                class="social-btn"
+                href="https://www.instagram.com/cbz_institute_bikki?stkn=bHNscWI4ampnbmw1"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                CBZ Instagram
+            </a>
+
+
+            <a
+                class="social-btn"
+                href="https://www.facebook.com/share/1NsW2gF3pp/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Facebook
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =====================================================
+     STUDENT LOGIN MODAL
+===================================================== -->
+
+<div
+    id="studentLoginModal"
+    class="modal"
+>
+
+    <div class="modal-card">
+
+        <button
+            class="close-btn"
+            onclick="closeModal('studentLoginModal')"
+        >
+            ×
+        </button>
+
+        <div class="modal-icon">
+            🎓
+        </div>
+
+        <h2>
+            Student Login
+        </h2>
+
+        <p class="modal-subtitle">
+            Login to access your learning dashboard.
+        </p>
+
+
+        <form id="studentLoginForm">
+
+            <input
+                type="tel"
+                id="loginPhone"
+                placeholder="Enter mobile number"
+                maxlength="10"
+                required
+            >
+
+            <input
+                type="password"
+                id="loginPin"
+                placeholder="Enter 4-digit PIN"
+                maxlength="4"
+                inputmode="numeric"
+                required
+            >
+
+            <button
+                type="submit"
+                class="primary-btn full-btn"
+            >
+                Login
+            </button>
+
+            <p
+                id="loginMessage"
+                class="form-message"
+            ></p>
+
+        </form>
+
+
+        <p class="switch-text">
+
+            New student?
+
+            <button
+                type="button"
+                onclick="switchToRegister()"
+            >
+                Create Profile
+            </button>
+
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     STUDENT REGISTER MODAL
+===================================================== -->
+
+<div
+    id="studentRegisterModal"
+    class="modal"
+>
+
+    <div class="modal-card">
+
+        <button
+            class="close-btn"
+            onclick="closeModal('studentRegisterModal')"
+        >
+            ×
+        </button>
+
+        <div class="modal-icon">
+            ✏️
+        </div>
+
+        <h2>
+            Student Profile
+        </h2>
+
+        <p class="modal-subtitle">
+            Create your student profile.
+        </p>
+
+
+        <form id="studentRegisterForm">
+
+            <input
+                type="text"
+                id="registerName"
+                placeholder="Full name"
+                required
+            >
+
+
+            <input
+                type="tel"
+                id="registerPhone"
+                placeholder="Mobile number"
+                maxlength="10"
+                required
+            >
+
+
+            <input
+                type="password"
+                id="registerPin"
+                placeholder="Create 4-digit PIN"
+                maxlength="4"
+                inputmode="numeric"
+                required
+            >
+
+
+            <select
+                id="registerClass"
+                required
+            >
+
+                <option value="">
+                    -- Select Class --
+                </option>
+
+                <option>Class 5</option>
+                <option>Class 6</option>
+                <option>Class 7</option>
+                <option>Class 8</option>
+                <option>Class 9</option>
+                <option>Class 10</option>
+                <option>Class 11</option>
+                <option>Class 12</option>
+
+            </select>
+
+
+            <input
+                type="text"
+                id="registerLocation"
+                placeholder="Your location"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="primary-btn full-btn"
+            >
+                Create Profile
+            </button>
+
+
+            <p
+                id="registerMessage"
+                class="form-message"
+            ></p>
+
+        </form>
+
+
+        <p class="switch-text">
+
+            Already registered?
+
+            <button
+                type="button"
+                onclick="switchToLogin()"
+            >
+                Login
+            </button>
+
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ADMIN LOGIN MODAL
+===================================================== -->
+
+<div
+    id="adminLoginModal"
+    class="modal"
+>
+
+    <div class="modal-card">
+
+        <button
+            class="close-btn"
+            onclick="closeModal('adminLoginModal')"
+        >
+            ×
+        </button>
+
+        <div class="modal-icon">
+            🔐
+        </div>
+
+        <h2>
+            Admin Login
+        </h2>
+
+        <p class="modal-subtitle">
+            Login to manage institute content.
+        </p>
+
+
+        <form id="adminLoginForm">
+
+            <input
+                type="text"
+                id="adminUsername"
+                placeholder="Username"
+                required
+            >
+
+
+            <input
+                type="password"
+                id="adminPassword"
+                placeholder="Password"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="primary-btn full-btn"
+            >
+                Admin Login
+            </button>
+
+
+            <p
+                id="adminLoginMessage"
+                class="form-message"
+            ></p>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     STUDENT DASHBOARD
+===================================================== -->
+
+<section
+    id="studentDashboard"
+    class="dashboard-page hidden"
+>
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <div class="dashboard-label">
+                STUDENT DASHBOARD
+            </div>
+
+            <h1>
+                Welcome,
+                <span id="studentDashboardName">
+                    Student
+                </span>
+            </h1>
+
+            <p>
+                Choose what you want to learn today.
+            </p>
+
+        </div>
+
+
+        <button
+            class="logout-btn"
+            onclick="studentLogout()"
+        >
+            Logout
+        </button>
+
+    </div>
+
+
+    <div class="dashboard-grid">
+
+
+        <!-- NOTES -->
+
+        <div
+            class="dashboard-card"
+            onclick="openNotes()"
+        >
+
+            <div class="dashboard-icon">
+                📚
+            </div>
+
+            <h3>
+                Notes
+            </h3>
+
+            <p>
+                Class-wise and subject-wise study materials.
+            </p>
+
+            <button>
+                Open
+            </button>
+
+        </div>
+
+
+        <!-- MOCK TESTS -->
+
+        <div
+            class="dashboard-card"
+            onclick="openMockTests()"
+        >
+
+            <div class="dashboard-icon">
+                📝
+            </div>
+
+            <h3>
+                Mock Tests
+            </h3>
+
+            <p>
+                Practice tests and check your score.
+            </p>
+
+            <button>
+                Start
+            </button>
+
+        </div>
+
+
+        <!-- VIDEO CLASSES -->
+
+        <div
+            class="dashboard-card"
+            onclick="openYoutube()"
+        >
+
+            <div class="dashboard-icon">
+                ▶️
+            </div>
+
+            <h3>
+                Video Classes
+            </h3>
+
+            <p>
+                Watch CBZ Institute video lessons.
+            </p>
+
+            <button>
+                Watch
+            </button>
+
+        </div>
+
+
+        <!-- HELP DESK -->
+
+        <div
+            class="dashboard-card"
+            onclick="openHelpDesk()"
+        >
+
+            <div class="dashboard-icon">
+                💬
+            </div>
+
+            <h3>
+                Help Desk
+            </h3>
+
+            <p>
+                Get help with your doubts and questions.
+            </p>
+
+            <button>
+                Get Help
+            </button>
+
+        </div>
+
+
+        <!-- SYLLABUS -->
+
+        <div
+            class="dashboard-card"
+            onclick="openSyllabus()"
+        >
+
+            <div class="dashboard-icon">
+                📘
+            </div>
+
+            <h3>
+                Syllabus
+            </h3>
+
+            <p>
+                View available class-wise syllabus PDFs.
+            </p>
+
+            <button>
+                View
+            </button>
+
+        </div>
+
+
+        <!-- NOTICE -->
+
+        <div
+            class="dashboard-card"
+            onclick="openNoticeBoard()"
+        >
+
+            <div class="dashboard-icon">
+                📢
+            </div>
+
+            <h3>
+                Notice Board
+            </h3>
+
+            <p>
+                Read important institute announcements.
+            </p>
+
+            <button>
+                Open
+            </button>
+
+        </div>
+
+
+        <!-- QUESTION PAPERS -->
+
+        <div
+            class="dashboard-card"
+            onclick="openQuestionPapers()"
+        >
+
+            <div class="dashboard-icon">
+                📄
+            </div>
+
+            <h3>
+                Question Papers
+            </h3>
+
+            <p>
+                Practice available question papers.
+            </p>
+
+            <button>
+                View
+            </button>
+
+        </div>
+
+
+        <!-- PROFILE -->
+
+        <div
+            class="dashboard-card"
+            onclick="openProfile()"
+        >
+
+            <div class="dashboard-icon">
+                👤
+            </div>
+
+            <h3>
+                My Profile
+            </h3>
+
+            <p>
+                View your student profile information.
+            </p>
+
+            <button>
+                Profile
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     GENERAL CONTENT
+===================================================== -->
+
+<section
+    id="generalSection"
+    class="content-section hidden"
+>
+
+    <button
+        class="back-btn"
+        onclick="closeGeneralSection()"
+    >
+        ← Back to Dashboard
+    </button>
+
+
+    <div
+        id="generalContent"
+        class="general-container"
+    ></div>
+
+</section>
+
+
+<!-- =====================================================
+     NOTES SECTION
+===================================================== -->
+
+<section
+    id="notesSection"
+    class="content-section"
+    style="display:none;"
+>
+
+    <button
+        class="back-btn"
+        onclick="closeGeneralSection()"
+    >
+        ← Back to Dashboard
+    </button>
+
+
+    <div class="content-header">
+
+        <span>
+            STUDY MATERIALS
+        </span>
+
+        <h1>
+            📚 Study Notes
+        </h1>
+
+        <p>
+            Select your class and then choose a subject.
+        </p>
+
+    </div>
+
+
+    <div class="class-selector">
+
+        <label for="notesClass">
+            Select Class
+        </label>
+
+        <select id="notesClass">
+
+            <option value="">
+                -- Select Class --
+            </option>
+
+            <option>Class 5</option>
+            <option>Class 6</option>
+            <option>Class 7</option>
+            <option>Class 8</option>
+            <option>Class 9</option>
+            <option>Class 10</option>
+            <option>Class 11</option>
+            <option>Class 12</option>
+
+        </select>
+
+    </div>
+
+
+    <p
+        id="selectedClassText"
+        class="selected-class-text"
+    ></p>
+
+
+    <div
+        id="notesSubjects"
+        class="notes-subjects"
+    ></div>
+
+
+    <!--
+        JavaScript will turn this into a dynamic
+        list of ALL PDFs for the selected subject.
+    -->
+
+    <div
+        id="pdfNotes"
+        class="pdf-notes"
+        style="display:none;"
+    ></div>
+
+</section>
+
+
+<!-- =====================================================
+     ADMIN DASHBOARD
+===================================================== -->
+
+<section
+    id="adminDashboard"
+    class="dashboard-page hidden"
+>
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <div class="dashboard-label">
+                ADMIN PANEL
+            </div>
+
+            <h1>
+                CBZ Institute
+                <span>Admin</span>
+            </h1>
+
+            <p>
+                Manage learning resources for students.
+            </p>
+
+        </div>
+
+
+        <button
+            class="logout-btn"
+            onclick="adminLogout()"
+        >
+            Logout
+        </button>
+
+    </div>
+
+
+    <div class="dashboard-grid">
+
+
+        <!-- NOTES -->
+
+        <div
+            class="dashboard-card"
+            onclick="openAdminNotes()"
+        >
+
+            <div class="dashboard-icon">
+                📚
+            </div>
+
+            <h3>
+                Manage Notes
+            </h3>
+
+            <p>
+                Upload and manage study note PDFs.
+            </p>
+
+            <button>
+                Manage
+            </button>
+
+        </div>
+
+
+        <!-- MOCK TESTS -->
+
+        <div
+            class="dashboard-card"
+            onclick="openAdminMockTests()"
+        >
+
+            <div class="dashboard-icon">
+                📝
+            </div>
+
+            <h3>
+                Manage Mock Tests
+            </h3>
+
+            <p>
+                Manage available practice tests.
+            </p>
+
+            <button>
+                Manage
+            </button>
+
+        </div>
+
+
+        <!-- SYLLABUS -->
+
+        <div
+            class="dashboard-card"
+            onclick="openAdminSyllabus()"
+        >
+
+            <div class="dashboard-icon">
+                📘
+            </div>
+
+            <h3>
+                Manage Syllabus
+            </h3>
+
+            <p>
+                Upload class-wise syllabus PDFs.
+            </p>
+
+            <button>
+                Manage
+            </button>
+
+        </div>
+
+
+        <!-- QUESTION PAPERS -->
+
+        <div
+            class="dashboard-card"
+            onclick="openAdminQuestionPapers()"
+        >
+
+            <div class="dashboard-icon">
+                📄
+            </div>
+
+            <h3>
+                Manage Question Papers
+            </h3>
+
+            <p>
+                Upload and manage question papers.
+            </p>
+
+            <button>
+                Manage
+            </button>
+
+        </div>
+
+
+        <!-- NOTICES -->
+
+        <div
+            class="dashboard-card"
+            onclick="openAdminNotices()"
+        >
+
+            <div class="dashboard-icon">
+                📢
+            </div>
+
+            <h3>
+                Manage Notices
+            </h3>
+
+            <p>
+                Add and manage important notices.
+            </p>
+
+            <button>
+                Manage
+            </button>
+
+        </div>
+
+
+        <!-- VIDEOS -->
+
+        <div
+            class="dashboard-card"
+            onclick="openAdminVideos()"
+        >
+
+            <div class="dashboard-icon">
+                ▶️
+            </div>
+
+            <h3>
+                Manage Video Classes
+            </h3>
+
+            <p>
+                Manage CBZ Institute video links.
+            </p>
+
+            <button>
+                Manage
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="adminContentSection"
+        class="content-section hidden"
+    >
+
+        <button
+            class="back-btn"
+            onclick="closeAdminContent()"
+        >
+            ← Back to Admin Dashboard
+        </button>
+
+
+        <div
+            id="adminContent"
+            class="admin-panel-container"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <h3>
+        CBZ Institute of Education
+    </h3>
+
+    <p>
+        Learn • Practice • Succeed
+    </p>
+
+
+    <div class="footer-contact">
+
+        <a href="tel:+918981262617">
+            +91 8981262617
+        </a>
+
+        <a href="tel:+918910883754">
+            +91 8910883754
+        </a>
+
+    </div>
+
+
+    <p class="copyright">
+        © 2026 CBZ Institute of Education. All rights reserved.
+    </p>
+
+</footer>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script src="script.js"></script>
+
+</body>
+</html>
