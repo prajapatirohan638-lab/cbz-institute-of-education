@@ -5,7 +5,7 @@
         "subject": "Mathematics",
         "title": "maths",
         "description": "mentel maths",
-        "duration": 1,
+        "duration": 5,
         "questions": [
             {
                 "question": "456 + 789",
@@ -15,7 +15,7 @@
                     "1235",
                     "1255"
                 ],
-                "answer": 1
+                "answer": 0
             },
             {
                 "question": "900 - 456",
