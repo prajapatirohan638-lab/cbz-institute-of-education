@@ -1,6 +1,8 @@
-from flask import Flask, request, jsonify, send_from_directory
-from werkzeug.utils import secure_filename
+from flask import Flask, request, jsonify, send_from_directory, redirect
+from werkzeug.utils import redirect, secure_filename
 import os
+import requests
+import base64
 
 app = Flask(
     __name__,
@@ -18,6 +20,43 @@ NOTES_FOLDER = os.path.join(BASE_DIR, "notes")
 SYLLABUS_FOLDER = os.path.join(BASE_DIR, "syllabus")
 QUESTION_PAPER_FOLDER = os.path.join(BASE_DIR, "question-paper")
 MOCK_TESTS_FILE = os.path.join(BASE_DIR, "mock-tests.json")
+
+# ==============================
+# GitHub Storage Configuration
+# ==============================
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
+
+GITHUB_REPO = os.getenv(
+    "GITHUB_REPO",
+    "prajapatirohan638-lab/cbz-institute-of-education"
+).strip()
+
+GITHUB_BRANCH = os.getenv(
+    "GITHUB_BRANCH",
+    "master"
+).strip()
+
+GITHUB_API = f"https://api.github.com/repos/{GITHUB_REPO}/contents"
+
+
+def github_headers():
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
+    }
+
+    if GITHUB_TOKEN:
+        headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
+
+    return headers
+
+
+def github_raw_url(repo_path):
+    return (
+        f"https://raw.githubusercontent.com/"
+        f"{GITHUB_REPO}/{GITHUB_BRANCH}/{repo_path}"
+    )
 
 # ============================================================
 # MOCK TEST STORAGE
@@ -131,31 +170,63 @@ def get_document_folder(base_folder, class_name, subject):
 
 
 def list_pdfs(base_folder, class_name, subject, url_folder):
-    folder = get_document_folder(
-        base_folder,
-        class_name,
-        subject
-    )
 
-    if not folder or not os.path.exists(folder):
+    class_slug = get_class_slug(class_name)
+    subject_slug = get_subject_slug(subject)
+
+    if not class_slug or not subject_slug:
         return []
 
-    files = []
-
-    for filename in os.listdir(folder):
-
-        if filename.lower().endswith(".pdf"):
-
-            files.append({
-                "name": filename,
-                "path": f"{url_folder}/{CLASSES[class_name]}/{SUBJECTS[subject]}/{filename}"
-            })
-
-    files.sort(
-        key=lambda item: item["name"].lower()
+    repo_folder = (
+        f"{url_folder}/"
+        f"{class_slug}/"
+        f"{subject_slug}"
     )
 
-    return files
+    try:
+        response = requests.get(
+            f"{GITHUB_API}/{repo_folder}",
+            headers=github_headers(),
+            params={"ref": GITHUB_BRANCH},
+            timeout=30
+        )
+
+        if response.status_code == 404:
+            return []
+
+        if response.status_code != 200:
+            print("GitHub list error:", response.text)
+            return []
+
+        data = response.json()
+
+        files = []
+
+        for item in data:
+
+            if (
+                item.get("type") == "file"
+                and item.get("name", "").lower().endswith(".pdf")
+            ):
+                files.append({
+                    "name": item["name"],
+                    "path": (
+                        f"{url_folder}/"
+                        f"{class_slug}/"
+                        f"{subject_slug}/"
+                        f"{item['name']}"
+                    )
+                })
+
+        files.sort(
+            key=lambda item: item["name"].lower()
+        )
+
+        return files
+
+    except Exception as e:
+        print("GitHub list error:", e)
+        return []
 
 
 def validate_pdf(file):
@@ -178,13 +249,10 @@ def upload_document(base_folder, class_name, subject, file, url_folder):
     if not valid:
         return False, message, None
 
-    folder = get_document_folder(
-        base_folder,
-        class_name,
-        subject
-    )
+    class_slug = get_class_slug(class_name)
+    subject_slug = get_subject_slug(subject)
 
-    if folder is None:
+    if not class_slug or not subject_slug:
         return False, "Invalid class or subject.", None
 
     filename = secure_filename(file.filename)
@@ -192,22 +260,67 @@ def upload_document(base_folder, class_name, subject, file, url_folder):
     if not filename:
         return False, "Invalid file name.", None
 
-    file_path = os.path.join(folder, filename)
-
-    # Do not overwrite an existing file
-    if os.path.exists(file_path):
-        return False, "A PDF with this name already exists.", None
-
-    file.save(file_path)
-
-    relative_path = (
+    # GitHub file path
+    repo_path = (
         f"{url_folder}/"
-        f"{CLASSES[class_name]}/"
-        f"{SUBJECTS[subject]}/"
+        f"{class_slug}/"
+        f"{subject_slug}/"
         f"{filename}"
     )
 
-    return True, "PDF uploaded successfully!", relative_path
+    if not GITHUB_TOKEN:
+        return False, "GitHub storage is not configured.", None
+
+    # Check whether file already exists on GitHub
+    check_url = f"{GITHUB_API}/{repo_path}"
+
+    check_response = requests.get(
+        check_url,
+        headers=github_headers(),
+        params={"ref": GITHUB_BRANCH},
+        timeout=30
+    )
+
+    if check_response.status_code == 200:
+        return False, "A PDF with this name already exists.", None
+
+    if check_response.status_code != 404:
+        return False, "Could not check GitHub storage.", None
+
+    try:
+        # Read PDF
+        file_bytes = file.read()
+
+        # Convert PDF to Base64
+        encoded_file = base64.b64encode(file_bytes).decode("utf-8")
+
+        # Upload to GitHub
+        response = requests.put(
+            check_url,
+            headers=github_headers(),
+            json={
+                "message": f"Upload {filename}",
+                "content": encoded_file,
+                "branch": GITHUB_BRANCH
+            },
+            timeout=60
+        )
+
+        if response.status_code not in (200, 201):
+            return False, "Could not upload PDF to GitHub.", None
+
+        relative_path = (
+            f"{url_folder}/"
+            f"{class_slug}/"
+            f"{subject_slug}/"
+            f"{filename}"
+        )
+
+        return True, "PDF uploaded successfully!", relative_path
+
+    except Exception as e:
+        print("GitHub upload error:", e)
+        return False, "An error occurred while uploading the PDF.", None
 
 
 def delete_document(base_folder, class_name, subject, filename):
@@ -218,12 +331,6 @@ def delete_document(base_folder, class_name, subject, filename):
     if not class_slug or not subject_slug:
         return False, "Invalid class or subject."
 
-    folder = os.path.join(
-        base_folder,
-        class_slug,
-        subject_slug
-    )
-
     safe_filename = secure_filename(
         str(filename or "")
     )
@@ -231,28 +338,70 @@ def delete_document(base_folder, class_name, subject, filename):
     if not safe_filename:
         return False, "Invalid file name."
 
-    file_path = os.path.join(
-        folder,
-        safe_filename
+    # Decide GitHub folder
+    if os.path.normpath(base_folder) == os.path.normpath(NOTES_FOLDER):
+        url_folder = "notes"
+
+    elif os.path.normpath(base_folder) == os.path.normpath(SYLLABUS_FOLDER):
+        url_folder = "syllabus"
+
+    elif os.path.normpath(base_folder) == os.path.normpath(QUESTION_PAPER_FOLDER):
+        url_folder = "question-paper"
+
+    else:
+        return False, "Invalid document folder."
+
+    repo_path = (
+        f"{url_folder}/"
+        f"{class_slug}/"
+        f"{subject_slug}/"
+        f"{safe_filename}"
     )
 
-    # Security check
-    folder_real = os.path.realpath(folder)
-    file_real = os.path.realpath(file_path)
-
-    if os.path.commonpath(
-        [folder_real, file_real]
-    ) != folder_real:
-        return False, "Invalid file path."
-
-    if not os.path.isfile(file_real):
-        return False, "PDF not found."
+    if not GITHUB_TOKEN:
+        return False, "GitHub storage is not configured."
 
     try:
-        os.remove(file_real)
+        file_url = f"{GITHUB_API}/{repo_path}"
+
+        # Get file information and SHA
+        response = requests.get(
+            file_url,
+            headers=github_headers(),
+            params={"ref": GITHUB_BRANCH},
+            timeout=30
+        )
+
+        if response.status_code == 404:
+            return False, "PDF not found."
+
+        if response.status_code != 200:
+            return False, "Could not find PDF on GitHub."
+
+        file_data = response.json()
+        file_sha = file_data.get("sha")
+
+        # Delete from GitHub
+        delete_response = requests.delete(
+            file_url,
+            headers=github_headers(),
+            json={
+                "message": f"Delete {safe_filename}",
+                "sha": file_sha,
+                "branch": GITHUB_BRANCH
+            },
+            timeout=30
+        )
+
+        if delete_response.status_code != 200:
+            print("GitHub delete error:", delete_response.text)
+            return False, "Could not delete PDF from GitHub."
+
         return True, "PDF deleted successfully!"
-    except Exception:
-        return False, "Could not delete the PDF."
+
+    except Exception as e:
+        print("GitHub delete error:", e)
+        return False, "An error occurred while deleting the PDF."
 
 
 # =========================
@@ -399,11 +548,8 @@ def delete_note():
 
 @app.route("/notes/<path:filename>")
 def serve_notes(filename):
-
-    return send_from_directory(
-        NOTES_FOLDER,
-        filename
-    )
+    github_path = f"notes/{filename}"
+    return redirect(github_raw_url(github_path))
 
 
 # ============================================================
@@ -526,11 +672,8 @@ def delete_syllabus():
 
 @app.route("/syllabus/<path:filename>")
 def serve_syllabus(filename):
-
-    return send_from_directory(
-        SYLLABUS_FOLDER,
-        filename
-    )
+    github_path = f"syllabus/{filename}"
+    return redirect(github_raw_url(github_path))
 
 
 # ============================================================
@@ -654,15 +797,10 @@ def delete_question_paper():
     })
 
 
-@app.route(
-    "/question-paper/<path:filename>"
-)
+@app.route("/question-paper/<path:filename>")
 def serve_question_paper(filename):
-
-    return send_from_directory(
-        QUESTION_PAPER_FOLDER,
-        filename
-    )
+    github_path = f"question-paper/{filename}"
+    return redirect(github_raw_url(github_path))
 
 # ============================================================
 # MOCK TEST API
