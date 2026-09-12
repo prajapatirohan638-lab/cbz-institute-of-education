@@ -61,52 +61,160 @@ def github_raw_url(repo_path):
 # ============================================================
 # MOCK TEST STORAGE
 # ============================================================
+# ============================================================
+# MOCK TEST STORAGE - GITHUB
+# ============================================================
 
 import json
 import uuid
 
 
+MOCK_TESTS_REPO_PATH = "mock-tests.json"
+
+
 def load_mock_tests():
 
-    if not os.path.exists(MOCK_TESTS_FILE):
+    if not GITHUB_TOKEN:
+        print("GitHub token is not configured.")
         return []
 
     try:
-        with open(
-            MOCK_TESTS_FILE,
-            "r",
-            encoding="utf-8"
-        ) as file:
-            data = json.load(file)
 
-        if isinstance(data, list):
-            return data
+        response = requests.get(
+            f"{GITHUB_API}/{MOCK_TESTS_REPO_PATH}",
+            headers=github_headers(),
+            params={"ref": GITHUB_BRANCH},
+            timeout=30
+        )
+
+        # File does not exist yet
+        if response.status_code == 404:
+            return []
+
+        if response.status_code != 200:
+            print(
+                "GitHub mock test load error:",
+                response.text
+            )
+            return []
+
+        data = response.json()
+
+        encoded_content = data.get("content", "")
+        encoded_content = encoded_content.replace("\n", "")
+
+        decoded_content = base64.b64decode(
+            encoded_content
+        ).decode("utf-8")
+
+        tests = json.loads(decoded_content)
+
+        if isinstance(tests, list):
+            return tests
 
         return []
 
-    except (json.JSONDecodeError, OSError):
+    except Exception as e:
+
+        print(
+            "Mock test load error:",
+            e
+        )
+
         return []
 
 
 def save_mock_tests(tests):
 
-    with open(
-        MOCK_TESTS_FILE,
-        "w",
-        encoding="utf-8"
-    ) as file:
+    if not GITHUB_TOKEN:
+        print("GitHub token is not configured.")
+        return False
 
-        json.dump(
+    try:
+
+        file_url = (
+            f"{GITHUB_API}/"
+            f"{MOCK_TESTS_REPO_PATH}"
+        )
+
+        # Check whether mock-tests.json already exists
+        response = requests.get(
+            file_url,
+            headers=github_headers(),
+            params={"ref": GITHUB_BRANCH},
+            timeout=30
+        )
+
+        file_sha = None
+
+        if response.status_code == 200:
+
+            file_data = response.json()
+            file_sha = file_data.get("sha")
+
+        elif response.status_code != 404:
+
+            print(
+                "GitHub mock test check error:",
+                response.text
+            )
+
+            return False
+
+        # Convert tests to JSON
+        json_content = json.dumps(
             tests,
-            file,
             indent=4,
             ensure_ascii=False
         )
 
+        # Convert JSON to Base64
+        encoded_content = base64.b64encode(
+            json_content.encode("utf-8")
+        ).decode("utf-8")
+
+        payload = {
+            "message": "Update mock tests",
+            "content": encoded_content,
+            "branch": GITHUB_BRANCH
+        }
+
+        # Existing file needs SHA
+        if file_sha:
+            payload["sha"] = file_sha
+
+        upload_response = requests.put(
+            file_url,
+            headers=github_headers(),
+            json=payload,
+            timeout=30
+        )
+
+        if upload_response.status_code not in (200, 201):
+
+            print(
+                "GitHub mock test save error:",
+                upload_response.text
+            )
+
+            return False
+
+        print("Mock tests saved to GitHub successfully.")
+
+        return True
+
+    except Exception as e:
+
+        print(
+            "Mock test save error:",
+            e
+        )
+
+        return False
+
 os.makedirs(NOTES_FOLDER, exist_ok=True)
 os.makedirs(SYLLABUS_FOLDER, exist_ok=True)
 os.makedirs(QUESTION_PAPER_FOLDER, exist_ok=True)
-os.makedirs(os.path.dirname(MOCK_TESTS_FILE), exist_ok=True)
 
 
 # =========================
