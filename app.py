@@ -584,9 +584,10 @@ def get_notices():
             "message": "Supabase connection failed."
         }), 500
 
-    @app.route("/api/notices", methods=["POST"])
-    def add_notice():
-        if not SUPABASE_URL or not SUPABASE_KEY:
+@app.route("/api/notices",
+methods=["POST"])
+def add_notice():
+    if not SUPABASE_URL or not SUPABASE_KEY:
          return jsonify({
             "success": False,
             "message": "Supabase is not configured."
