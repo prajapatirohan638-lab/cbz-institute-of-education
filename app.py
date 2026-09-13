@@ -5,6 +5,7 @@ import requests
 import base64
 SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
+SUPABASE_ADMIN_KEY = os.getenv("SUPABASE_ADMIN_KEY", "").strip()
 
 def supabase_headers():
     return {
@@ -581,6 +582,62 @@ def get_notices():
         return jsonify({
             "success": False,
             "message": "Supabase connection failed."
+        }), 500
+
+    @app.route("/api/notices", methods=["POST"])
+    def add_notice():
+        if not SUPABASE_URL or not SUPABASE_KEY:
+         return jsonify({
+            "success": False,
+            "message": "Supabase is not configured."
+        }), 500
+
+    try:
+        data = request.get_json()
+
+        title = (data.get("title") or "").strip()
+        message = (data.get("message") or "").strip()
+
+        if not title or not message:
+            return jsonify({
+                "success": False,
+                "message": "Title and message are required."
+            }), 400
+
+        response = requests.post(
+    f"{SUPABASE_URL}/rest/v1/notices",
+    headers={
+        "apikey": SUPABASE_ADMIN_KEY,
+        "Authorization": f"Bearer {SUPABASE_ADMIN_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    },
+            json={
+                "title": title,
+                "message": message
+            },
+            timeout=15
+        )
+
+        if response.status_code not in (200, 201):
+            print("Supabase add notice error:", response.text)
+
+            return jsonify({
+                "success": False,
+                "message": "Could not add notice."
+            }), 500
+
+        return jsonify({
+            "success": True,
+            "notice": response.json()[0]
+        })
+
+    except Exception as e:
+        print("Add notice error:", e)
+
+        return jsonify({
+            "success": False,
+            "message": "Failed to add notice."
         }), 500
 
 

@@ -4718,10 +4718,10 @@ function openAdminNotices() {
 }
 
 
-function renderAdminNotices() {
+async function renderAdminNotices() {
 
     const notices =
-        getNotices();
+    await getNotices();
 
 
     let html = `
@@ -4851,7 +4851,7 @@ function renderAdminNotices() {
 }
 
 
-function addNotice() {
+async function addNotice() {
 
     const title =
         document.getElementById(
@@ -4875,51 +4875,79 @@ function addNotice() {
     }
 
 
-    const notices =
-        getNotices();
+    try {
+
+        const response = await fetch(
+            "/api/notices",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    title: title,
+                    message: message
+                })
+            }
+        );
 
 
-    notices.unshift({
-
-        title: title,
-
-        message: message,
-
-        date: new Date().toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        })
-
-    });
+        const data =
+            await response.json();
 
 
-    localStorage.setItem(
-        "cbzNotices",
-        JSON.stringify(notices)
-    );
+        if (!response.ok || !data.success) {
+
+            console.error(
+                "Add notice error:",
+                data.message
+            );
+
+            alert(
+                data.message ||
+                "Could not add notice."
+            );
+
+            return;
+        }
 
 
-    document.getElementById(
-        "noticeTitle"
-    ).value = "";
-
-    document.getElementById(
-        "noticeMessage"
-    ).value = "";
+        document.getElementById(
+            "noticeTitle"
+        ).value = "";
 
 
-    alert(
-        "Notice added successfully!"
-    );
+        document.getElementById(
+            "noticeMessage"
+        ).value = "";
 
 
-    showAdminNotices();
+        alert(
+            "Notice added successfully!"
+        );
+
+
+        await renderAdminNotices();
+
+    } catch (error) {
+
+        console.error(
+            "Add notice failed:",
+            error
+        );
+
+        alert(
+            "Could not connect to the server."
+        );
+
+    }
 
 }
 
 
-function deleteNotice(index) {
+async function deleteNotice(index) {
 
     const notices =
         getNotices();
@@ -4953,7 +4981,7 @@ function deleteNotice(index) {
     );
 
 
-    showAdminNotices();
+    await renderAdminNotices();
 
 }
 
