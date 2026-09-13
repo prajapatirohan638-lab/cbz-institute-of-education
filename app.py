@@ -3,6 +3,15 @@ from werkzeug.utils import redirect, secure_filename
 import os
 import requests
 import base64
+SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
+
+def supabase_headers():
+    return {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json"
+    }
 
 app = Flask(
     __name__,
@@ -530,10 +539,50 @@ def home():
 
 @app.route("/api/health")
 def health():
+
     return jsonify({
         "success": True,
         "message": "CBZ Institute server is running."
     })
+
+@app.route("/api/notices", methods=["GET"])
+def get_notices():
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return jsonify({
+            "success": False,
+            "message": "Supabase is not configured."
+        }), 500
+
+    try:
+        response = requests.get(
+            f"{SUPABASE_URL}/rest/v1/notices",
+            headers=supabase_headers(),
+            params={
+                "select": "id,title,message,created_at",
+                "order": "created_at.desc"
+            },
+            timeout=15
+        )
+
+        if response.status_code != 200:
+            print("Supabase notices error:", response.text)
+            return jsonify({
+                "success": False,
+                "message": "Could not load notices."
+            }), 500
+
+        return jsonify({
+            "success": True,
+            "notices": response.json()
+        })
+
+    except Exception as e:
+        print("Supabase connection error:", e)
+        return jsonify({
+            "success": False,
+            "message": "Supabase connection failed."
+        }), 500
+
 
 
 # ============================================================
