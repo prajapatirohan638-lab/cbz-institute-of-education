@@ -2645,24 +2645,31 @@ function openHelpDesk() {
    NOTICE BOARD
 ========================================================= */
 
-function getNotices() {
+async function getNotices() {
 
     try {
 
-        return JSON.parse(
-            localStorage.getItem(
-                "cbzNotices"
-            )
-        ) || [];
+        const response = await fetch("/api/notices");
 
-    } catch {
+        const data = await response.json();
+
+        if (data.success) {
+            return data.notices || [];
+        }
+
+        console.error("Notice API error:", data.message);
+
+        return [];
+
+    } catch (error) {
+
+        console.error("Could not load notices:", error);
 
         return [];
 
     }
 
 }
-
 
 function saveNotices(notices) {
 
@@ -2674,11 +2681,10 @@ function saveNotices(notices) {
 }
 
 
-function openNoticeBoard() {
+async function openNoticeBoard() {
 
     const notices =
-        getNotices();
-
+        await getNotices();
 
     let html = `
 
