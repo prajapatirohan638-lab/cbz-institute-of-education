@@ -5080,27 +5080,23 @@ function showStudentNotices() {
 }
 
 
-function getNotices() {
-
+async function getNotices() {
     try {
+        const response = await fetch("/api/notices");
 
-        return JSON.parse(
-            localStorage.getItem(
-                "cbzNotices"
-            )
-        ) || [];
+        const data = await response.json();
 
-    } catch (error) {
+        if (data.success) {
+            return data.notices || [];
+        }
 
-        console.error(
-            "Unable to load notices:",
-            error
-        );
-
+        console.error("Notice API error:", data.message);
         return [];
 
+    } catch (error) {
+        console.error("Could not load notices:", error);
+        return [];
     }
-
 }
 
 
