@@ -650,6 +650,58 @@ def add_notice():
             "message": "Failed to add notice."
         }), 500
 
+@app.route("/api/notices/<int:notice_id>", methods=["DELETE"])
+def delete_notice(notice_id):
+    if not SUPABASE_URL or not SUPABASE_ADMIN_KEY:
+        return jsonify({
+            "success": False,
+            "message": "Supabase is not configured."
+        }), 500
+
+    try:
+        response = requests.delete(
+            f"{SUPABASE_URL}/rest/v1/notices",
+            headers={
+                "apikey": SUPABASE_ADMIN_KEY,
+                "Authorization": f"Bearer {SUPABASE_ADMIN_KEY}",
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+            },
+            params={
+                "id": f"eq.{notice_id}"
+            },
+            timeout=15
+        )
+
+        if response.status_code not in (200, 204):
+            print("Supabase delete notice error:", response.text)
+
+            return jsonify({
+                "success": False,
+                "message": "Could not delete notice."
+            }), 500
+
+        deleted = response.json() if response.text else []
+
+        if not deleted:
+            return jsonify({
+                "success": False,
+                "message": "Notice not found."
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "message": "Notice deleted successfully."
+        })
+
+    except Exception as e:
+        print("Delete notice error:", e)
+
+        return jsonify({
+            "success": False,
+            "message": "Failed to delete notice."
+        }), 500
+
 # ============================================================
 # PUSH NOTIFICATIONS
 # ============================================================
