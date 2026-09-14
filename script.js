@@ -4946,50 +4946,65 @@ async function addNotice() {
 
 }
 
-
 async function deleteNotice(index) {
 
-    const notices =
-        getNotices();
+    const notices = await getNotices();
 
+    const notice = notices[index];
 
-    if (!notices[index]) {
+    if (!notice) {
         return;
     }
 
-
-    const confirmDelete =
-        confirm(
-            "Are you sure you want to delete this notice?"
-        );
-
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this notice?"
+    );
 
     if (!confirmDelete) {
         return;
     }
 
+    try {
 
-    notices.splice(
-        index,
-        1
-    );
+        const response = await fetch(
+            `/api/notices/${notice.id}`,
+            {
+                method: "DELETE"
+            }
+        );
 
+        const result = await response.json();
 
-    localStorage.setItem(
-        "cbzNotices",
-        JSON.stringify(notices)
-    );
+        if (!response.ok || !result.success) {
+            alert(
+                result.message ||
+                "Could not delete notice."
+            );
+            return;
+        }
 
+        alert("Notice deleted successfully!");
 
-    await renderAdminNotices();
+        await renderAdminNotices();
 
+    } catch (error) {
+
+        console.error(
+            "Delete notice failed:",
+            error
+        );
+
+        alert(
+            "Could not connect to the server."
+        );
+    }
 }
 
 
-function showStudentNotices() {
+async function showStudentNotices() {
 
     const notices =
-        getNotices();
+        await getNotices();
 
 
     const generalSection =
