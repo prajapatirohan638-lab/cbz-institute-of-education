@@ -9,6 +9,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
 SUPABASE_ADMIN_KEY = os.getenv("SUPABASE_ADMIN_KEY", "").strip()
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "").strip()
 VAPID_EMAIL = os.getenv("VAPID_EMAIL", "").strip()
+print("VAPID DEBUG:", bool(VAPID_PRIVATE_KEY), bool(VAPID_EMAIL))
 
 def supabase_headers():
     return {
