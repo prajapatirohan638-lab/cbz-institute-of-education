@@ -1,11 +1,14 @@
 from flask import Flask, request, jsonify, send_from_directory, redirect
 from werkzeug.utils import redirect, secure_filename
+from pywebpush import webpush, WebPushException
 import os
 import requests
 import base64
 SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
 SUPABASE_ADMIN_KEY = os.getenv("SUPABASE_ADMIN_KEY", "").strip()
+VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "").strip()
+VAPID_EMAIL = os.getenv("VAPID_EMAIL", "").strip()
 
 def supabase_headers():
     return {
@@ -584,17 +587,16 @@ def get_notices():
             "message": "Supabase connection failed."
         }), 500
 
-@app.route("/api/notices",
-methods=["POST"])
+@app.route("/api/notices", methods=["POST"])
 def add_notice():
-    if not SUPABASE_URL or not SUPABASE_KEY:
-         return jsonify({
+    if not SUPABASE_URL or not SUPABASE_ADMIN_KEY:
+        return jsonify({
             "success": False,
             "message": "Supabase is not configured."
         }), 500
 
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
 
         title = (data.get("title") or "").strip()
         message = (data.get("message") or "").strip()
@@ -606,13 +608,13 @@ def add_notice():
             }), 400
 
         response = requests.post(
-    f"{SUPABASE_URL}/rest/v1/notices",
-    headers={
-        "apikey": SUPABASE_ADMIN_KEY,
-        "Authorization": f"Bearer {SUPABASE_ADMIN_KEY}",
-        "Content-Type": "application/json",
-        "Prefer": "return=representation"
-    },
+            f"{SUPABASE_URL}/rest/v1/notices",
+            headers={
+                "apikey": SUPABASE_ADMIN_KEY,
+                "Authorization": f"Bearer {SUPABASE_ADMIN_KEY}",
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+            },
             json={
                 "title": title,
                 "message": message
@@ -622,11 +624,12 @@ def add_notice():
 
         if response.status_code not in (200, 201):
             print("Supabase add notice error:", response.text)
-
             return jsonify({
                 "success": False,
                 "message": "Could not add notice."
             }), 500
+
+        send_push_notification(title, message)
 
         return jsonify({
             "success": True,
@@ -635,11 +638,152 @@ def add_notice():
 
     except Exception as e:
         print("Add notice error:", e)
-
         return jsonify({
             "success": False,
             "message": "Failed to add notice."
         }), 500
+
+# ============================================================
+# PUSH NOTIFICATIONS
+# ============================================================
+
+def send_push_notification(title, message):
+    if not SUPABASE_URL or not SUPABASE_ADMIN_KEY:
+        print("Supabase is not configured.")
+        return
+
+    if not VAPID_PRIVATE_KEY or not VAPID_EMAIL:
+        print("VAPID settings are not configured.")
+        return
+
+    response = requests.get(
+        f"{SUPABASE_URL}/rest/v1/push_subscriptions",
+        headers={
+            "apikey": SUPABASE_ADMIN_KEY,
+            "Authorization": f"Bearer {SUPABASE_ADMIN_KEY}"
+        },
+        params={
+            "select": "id,subscription"
+        },
+        timeout=15
+    )
+
+    if response.status_code != 200:
+        print("Could not load push subscriptions:", response.text)
+        return
+
+    subscriptions = response.json()
+
+    for item in subscriptions:
+        try:
+            webpush(
+                subscription_info=item["subscription"],
+                data=json.dumps({
+                    "title": title,
+                    "body": message
+                }),
+                vapid_private_key=VAPID_PRIVATE_KEY,
+                vapid_claims={
+                    "sub": VAPID_EMAIL
+                }
+            )
+
+        except WebPushException as e:
+            print("Push notification failed:", e)
+
+        except Exception as e:
+            print("Push notification error:", e)
+
+
+@app.route("/api/push-subscription", methods=["POST"])
+def save_push_subscription():
+
+    print("DEBUG:", bool(SUPABASE_URL), bool(SUPABASE_ADMIN_KEY))
+
+            
+
+    if not SUPABASE_URL or not SUPABASE_ADMIN_KEY:
+        return jsonify({
+            "success": False,
+            "message": "Supabase is not configured."
+        }), 500
+
+    try:
+        data = request.get_json(silent=True) or {}
+        subscription = data.get("subscription")
+
+        if not subscription:
+            return jsonify({
+                "success": False,
+                "message": "Push subscription is required."
+            }), 400
+
+        endpoint = subscription.get("endpoint")
+
+        if not endpoint:
+            return jsonify({
+                "success": False,
+                "message": "Subscription endpoint is missing."
+            }), 400
+
+        response = requests.post(
+            f"{SUPABASE_URL}/rest/v1/push_subscriptions",
+            headers={
+                "apikey": SUPABASE_ADMIN_KEY,
+                "Authorization": f"Bearer {SUPABASE_ADMIN_KEY}",
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+            },
+            json={
+                "endpoint": endpoint,
+                "subscription": subscription
+            },
+            timeout=15
+        )
+
+        if response.status_code == 409:
+            response = requests.patch(
+                f"{SUPABASE_URL}/rest/v1/push_subscriptions",
+                headers={
+                    "apikey": SUPABASE_ADMIN_KEY,
+                    "Authorization": f"Bearer {SUPABASE_ADMIN_KEY}",
+                    "Content-Type": "application/json",
+                    "Prefer": "return=representation"
+                },
+                params={
+                    "endpoint": f"eq.{endpoint}"
+                },
+                json={
+                    "subscription": subscription
+                },
+                timeout=15
+            )
+
+        if response.status_code not in (200, 201):
+            print(
+                "Supabase push subscription error:",
+                response.text
+            )
+
+            return jsonify({
+                "success": False,
+                "message": "Could not save push subscription."
+            }), 500
+
+        return jsonify({
+            "success": True,
+            "message": "Push subscription saved."
+        })
+
+    except Exception as e:
+        print("Push subscription error:", e)
+
+        return jsonify({
+            "success": False,
+            "message": "Failed to save push subscription."
+        }), 500
+
+
 
 
 

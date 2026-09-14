@@ -5138,3 +5138,96 @@ function escapeHtml(value) {
         .replace(/'/g, "&#039;");
 
 }
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker
+            .register("/service-worker.js")
+            .then(function (registration) {
+                console.log(
+                    "Service Worker registered:",
+                    registration.scope
+                );
+            })
+            .catch(function (error) {
+                console.error(
+                    "Service Worker registration failed:",
+                    error
+                );
+            });
+    });
+}
+async function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+        alert("This browser does not support notifications.");
+        return;
+    }
+
+    const permission = await Notification.requestPermission();
+
+    if (permission === "granted") {
+        console.log("Notification permission granted");
+        subscribeToPushNotifications();
+    } else {
+        console.log("Notification permission:", permission);
+    }
+}
+requestNotificationPermission();
+
+const VAPID_PUBLIC_KEY = "BJN-qOyZnRUCjHKxTk2aqXrQr1KKgVtpWDZj-_M0OOpedIn6R1OQzsxPjZBvO0pvDt2QuD4upLE53tTHbs0tqm4"
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+
+    const rawData = window.atob(base64);
+
+    return Uint8Array.from(
+        [...rawData].map(char => char.charCodeAt(0))
+    );
+}
+
+async function subscribeToPushNotifications() {
+    console.log("SUBSCRIBE FUNCTION CALLED");
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        console.log("Push notifications are not supported.");
+        return;
+    }
+
+    if (Notification.permission !== "granted") {
+        console.log("Notification permission not granted.");
+        return;
+    }
+
+    try {
+        const registration = await navigator.serviceWorker.ready;
+
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+
+        console.log("Push subscription created:", subscription);
+        const response = await fetch("/api/push-subscription", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                subscription: subscription
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            console.log("Push subscription saved to server.");
+        } else {
+            console.error("Could not save push subscription:", result.message);
+        }
+
+    } catch (error) {
+        console.error("Push subscription failed:", error);
+    }
+}
