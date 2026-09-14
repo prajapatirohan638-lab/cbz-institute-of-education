@@ -8,6 +8,12 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "").strip()
 SUPABASE_ADMIN_KEY = os.getenv("SUPABASE_ADMIN_KEY", "").strip()
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "").replace("\\n", "\n").strip()
+print(
+    "VAPID KEY CHECK:",
+    VAPID_PRIVATE_KEY.startswith("-----BEGIN EC PRIVATE KEY-----"),
+    VAPID_PRIVATE_KEY.endswith("-----END EC PRIVATE KEY-----"),
+    len(VAPID_PRIVATE_KEY)
+)
 VAPID_EMAIL = os.getenv("VAPID_EMAIL", "").strip()
 print("VAPID DEBUG:", bool(VAPID_PRIVATE_KEY), bool(VAPID_EMAIL))
 
