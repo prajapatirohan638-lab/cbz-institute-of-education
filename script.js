@@ -5173,7 +5173,7 @@ async function requestNotificationPermission() {
 }
 requestNotificationPermission();
 
-const VAPID_PUBLIC_KEY = "BFgprD11rhr1IAEKdgPXlp7arEwDzNLqmrir8yrLPFmSHfnQ2WwvIw35wWpKutBSzJ35CPksc20nGv3n2kFhNm0"
+const VAPID_PUBLIC_KEY = "BOQgyW8r-aL5SeuhYKloNE6HmJXeYYANM4ZNHz5a0f6UFxvF1MiIOukasP0SUBOID4AhC5n-UZkKHGD35icdr3s"
 
 function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - base64String.length % 4) % 4);
